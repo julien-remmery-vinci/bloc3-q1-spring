@@ -15,26 +15,30 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class ProductController {
-  private static final List<Product> products = new ArrayList<>();
-  private static int lastId = 0;
 
-  static {
-    products.add(new Product(1, "Laptop", "Electronics", 1200));
-    products.add(new Product(2, "Mouse", "Electronics", 20));
-    lastId = products.size();
+  private final ProductsService productsService;
+
+  public ProductController(ProductsService productsService) {
+    this.productsService = productsService;
   }
 
   @GetMapping("/products")
   public Iterable<Product> readAll() {
-    return products;
+    return productsService.readAll();
   }
 
   @GetMapping("/products/{id}")
   public Product readOne(@PathVariable int id) {
     if(id <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    Product found = products.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
+    Product found = productsService.readOne(id);
     if(found == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     return found;
+  }
+
+  @GetMapping("/products/category/{category}")
+  public Iterable<Product> readByCategory(@PathVariable String category) {
+    if(category == null || category.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    return productsService.readByCategory(category);
   }
 
   @PostMapping("/products")
@@ -43,32 +47,27 @@ public class ProductController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
-    product.setId(lastId + 1);
-    lastId++;
-
-    products.add(product);
-    return new ResponseEntity<>(product, HttpStatus.CREATED);
+    Product created = productsService.createOne(product);
+    return new ResponseEntity<>(created, HttpStatus.CREATED);
   }
 
   @PutMapping("/products/{id}")
-  public ResponseEntity<Product> updateOne(@PathVariable int id, @RequestBody Product product) {
+  public Product updateOne(@PathVariable int id, @RequestBody Product product) {
+    if (id <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     if(product.invalid()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
-    Product found = products.stream().filter(p -> p.getId() == id).findAny().orElse(null);
+    Product found = productsService.readOne(id);
     if(found == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-    product.setId(found.getId());
-    products.remove(found);
-    products.add(product);
-    return new ResponseEntity<>(product, HttpStatus.OK);
+    return productsService.updateOne(id, product);
   }
 
   @DeleteMapping("/products/{id}")
   public void deleteOne(@PathVariable int id) {
     if(id <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    Product found = products.stream().filter(p -> p.getId() == id).findAny().orElse(null);
+    Product found = productsService.readOne(id);
     if(found == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-    products.remove(found);
+    productsService.deleteOne(id);
   }
 }
