@@ -1,0 +1,390 @@
+openapi: 3.0.3
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  
+  /authentication/connect:
+    post:
+      summary: "Connect a user"
+      operationId: "connect"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnsafeCredentials"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /authentication/verify:
+    post:
+      summary: "Verify a token"
+      operationId: "verify"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /authentication/{pseudo}:
+    put:
+      summary: "Modify a user's credentials"
+      operationId: "updateOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnsafeCredentials"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+    post:
+      summary: "Create a user's credentials"
+      operationId: "createOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnsafeCredentials"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "Delete a user's credentials"
+      operationId: "deleteCredentials"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+  
+  /products/{productId}:
+    get:
+      summary: "GET /products/{productId}"
+      parameters:
+        - name: "productId"
+          in: "path"
+          required: false
+      responses:
+        "200":
+          description: "OK"
+  
+  /carts/products/{productId}:
+    delete:
+      summary: "Remove a product from all carts"
+      operationId: "removeProductFromAllCarts"
+      parameters:
+        - name: "productId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+  
+  /carts/users/{pseudo}:
+    get:
+      summary: "Get a user's cart"
+      operationId: "getCart"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/CartItem"
+    delete:
+      summary: "Clear a user's cart"
+      operationId: "clearCart"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+  
+  /carts/users/{pseudo}/products/{productId}:
+    post:
+      summary: "Add a product to a user's cart"
+      operationId: "addProductToCart"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "productId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+    delete:
+      summary: "Remove a product from a user's cart"
+      operationId: "removeProductFromCart"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "productId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+  
+  /products:
+    get:
+      summary: "Get all products"
+      operationId: "readAll"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Product"
+    post:
+      summary: "Create a product"
+      operationId: "createOne"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Product"
+  
+  /products/category/{category}:
+    get:
+      summary: "Read all products for a category"
+      operationId: "readByCategory"
+      parameters:
+        - name: "category"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Product"
+  
+  /products/{id}:
+    get:
+      summary: "Read a product"
+      operationId: "readOne"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Product"
+    put:
+      summary: "Update a product"
+      operationId: "updateOne"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      summary: "Delete a product"
+      operationId: "deleteOne"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+  
+  /users/{pseudo}:
+    get:
+      summary: "Read a user"
+      operationId: "readOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      summary: "Update a user"
+      operationId: "updateOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+    post:
+      summary: "Create a user"
+      operationId: "createOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "Delete a user"
+      operationId: "deleteOne"
+      parameters:
+        - name: "pseudo"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        pseudo:
+          type: string
+          description: Pseudo de l'utilisateur
+        firstname:
+          type: string
+          description: Prénom de l'utilisateur
+        lastname:
+          type: string
+          description: Nom de l'utilisateur
+      example:
+        pseudo: Hunter2
+        firstname: Clara
+        lastname: Dubois
+    Void:
+    
+    Product:
+      
+    CartItem:
+    
+    UnsafeCredentials:
+      
